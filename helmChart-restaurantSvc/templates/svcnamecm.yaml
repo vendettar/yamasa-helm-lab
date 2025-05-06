@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: restaurant-svc-name
+data:
+  #DONE define correct restaurant service name and kitchen service name here, for
+  #order service to call APIs from them.
+  restaurantsvc_name: {{ .Release.Name }}-restaurant-svc
+  kitchensvc_name: {{ .Release.Name }}-kitchensvc

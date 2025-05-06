@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-kitchensvcapp
+  labels:
+    app: kitchensvc
+    version: v0
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: kitchensvc
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        #DONE define proper label/labels for pod template.
+        app: kitchensvc
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "restaurant-svc.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: kitchensvcapp
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          #DONE implement image path by repo and tag, from Values.yaml
+          image: "{{ .Values.image.repository }}:{{ .Values.image.kitchenSvc.tag }}"
+
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            #DONE implement port here. Leverage the properties we defined in Values.yaml.
+            - name: http
+              containerPort: {{ .Values.service.kitchenSvc.targetPort }}
+              protocol: TCP
+          #DONE implement proper port, readiness and liveness probes here.
+          #DONE please provide a reasonable initialDelaySeconds here. You can try firstly remove it and see
+          #DONE what will happen per you app.
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            #DONE define proper hardware resources here. Leverage resources definition
+            # in Values.yaml
+            {{- toYaml .Values.resources.kitchenSvc | nindent 12 }}

@@ -1,0 +1,89 @@
+# Default values for restaurant-svc.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+#DONE implement docker repo and tags for the 2 services. In our lab, you need to put the 2 service
+#DONE images to the same repo, and distinguish them using tags.
+image:
+  repository: oonulven/nullius
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  restaurantSvc:
+    tag: restaurant-service.1.1
+  kitchenSvc:
+    tag: kitchen-service.1.2
+
+imagePullSecrets: 
+  - name: regcred
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  # DONE implement proper service type and port here for the 2 services.
+  restaurantSvc:
+    type: ClusterIP
+    port: 8763
+    targetPort: 8763
+  kitchenSvc:
+    type: ClusterIP
+    port: 8764
+    targetPort: 8764
+
+
+
+resources:
+  #DONE define proper hardware resource manifest for the 2 services. Your implementation should contain
+  #DONE 'requests' and 'limits' for both CPU and memory. Design them so that your app can run smoothly.
+  restaurantSvc:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+  kitchenSvc:
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

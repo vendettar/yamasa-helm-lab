@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-svc
+  labels:
+    {{- include "ordersvc.labels" . | nindent 4 }}
+spec:
+  #DONE define proper 'ports', 'type' and 'selector' below, to make service working properly.
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "ordersvc.selectorLabels" . | nindent 4 }}
