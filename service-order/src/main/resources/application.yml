@@ -21,10 +21,10 @@ restaurantsvc:
   host:
   port:
   orderverify:
-    uri: order/verify?orderId=zzbb
+    uri: order/verify?orderId=
 
 kitchensvc:
   host:
   port:
   createticket:
-    uri: ticket/create/112233
+    uri: ticket/create/

@@ -11,9 +11,9 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   restaurantSvc:
-    tag: restaurant-service.1.1
+    tag: restaurant-service.1.5
   kitchenSvc:
-    tag: kitchen-service.1.2
+    tag: kitchen-service.1.5
 
 imagePullSecrets: 
   - name: regcred

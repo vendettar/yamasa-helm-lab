@@ -9,7 +9,7 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   #DONE define your Docker tag here.
-  tag: order-service.1.1
+  tag: order-service.1.6
 
 imagePullSecrets: 
   - name: regcred

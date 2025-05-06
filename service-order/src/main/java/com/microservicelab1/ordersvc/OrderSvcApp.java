@@ -69,12 +69,13 @@ public class OrderSvcApp {
         try {
             res = String.format("%s:%s:%s", configVal,
                     createTicket(consumerId),
-                    orderVerify("aabb"));
+                    orderVerify(consumerId));
         } catch (IOException e) {
             log.error("IO异常发生", e);
             return ResponseEntity.internalServerError().build();
         }
         concSessions.decrementAndGet();
+        log.info("create order request finished. res: {}", res);
         return ResponseEntity.ok(res);
     }
 
@@ -84,12 +85,14 @@ public class OrderSvcApp {
     }
 
     private String createTicket(final String consumerId) throws IOException {
-        String url = String.format("http://%s:%s/%s", kitchenSvcHost, kitchenSvcPort, createTicketUri);
+        String url = String.format("http://%s:%s/%s", kitchenSvcHost, kitchenSvcPort, createTicketUri + consumerId);
+        log.info("[createTicket] url: {}", url);
         return httpClient.doPostAndGetString(url);
     }
 
     private String orderVerify(final String orderId) throws IOException {
-        String url = String.format("http://%s:%s/%s", restaurantSvcHost, restaurantSvcPort, orderVerifyUri);
+        String url = String.format("http://%s:%s/%s", restaurantSvcHost, restaurantSvcPort, orderVerifyUri + orderId);
+        log.info("[orderVerify] url: {}", url);
         return httpClient.doGetWithType(url, VerifyOrderResult.class).getReason();
     }
 }

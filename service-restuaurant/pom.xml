@@ -6,7 +6,7 @@
 
     <groupId>com.microservicelab1</groupId>
     <artifactId>restaurant-service</artifactId>
-    <version>1.1</version>
+    <version>1.5</version>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
