@@ -1,0 +1,27 @@
+{{- if .Values.installKitchensvcResillience -}}
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ .Release.Name }}-kitchensvc-virtual-service
+spec:
+  hosts:
+    #- ordersvc-svc
+  - restaurantsvc-kitchensvc
+    #- restaurantsvc-restaurant-svc
+  http:
+    # - match:
+    #     - uri:
+    #       prefix: /ticket/create
+    - route:
+      #DONE fill in route0 which points to kitchensvc subset v0 here, and its traffic weight should be 20%
+      - destination:
+          host: restaurantsvc-kitchensvc
+          subset: v0
+        weight: 20
+      # DONE fill in route1 which points to kitchensvc subset v1 here, and its traffic weight should be 80%
+      - destination:
+          host: restaurantsvc-kitchensvc
+          subset: v1
+        weight: 80
+
+{{- end -}}

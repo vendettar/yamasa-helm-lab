@@ -1,44 +1,48 @@
+{{- /* Loop through each version defined in .Values.kitchenServiceVersions */}}
+{{- range .Values.kitchenServiceVersions }}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-kitchensvcapp
+  name: {{ $.Release.Name }}-kitchensvcapp-{{ .version }}
   labels:
     app: kitchensvc
-    version: v0
+    version: {{ .version }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .replicaCount | default $.Values.replicaCount }}
   selector:
     matchLabels:
       app: kitchensvc
+      version: {{ .version }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- with $.Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         #DONE define proper label/labels for pod template.
         app: kitchensvc
+        version: {{ .version }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "restaurant-svc.serviceAccountName" . }}
+      serviceAccountName: {{ include "restaurant-svc.serviceAccountName" $ }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
       containers:
         - name: kitchensvcapp
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml $.Values.securityContext | nindent 12 }}
           #DONE implement image path by repo and tag, from Values.yaml
-          image: "{{ .Values.image.repository }}:{{ .Values.image.kitchenSvc.tag }}"
-
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ $.Values.image.repository }}:{{ .imageTag | default $.Values.image.kitchenSvc.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           ports:
             #DONE implement port here. Leverage the properties we defined in Values.yaml.
             - name: http
-              containerPort: {{ .Values.service.kitchenSvc.targetPort }}
+              containerPort: {{ $.Values.service.kitchenSvc.targetPort }}
               protocol: TCP
           #DONE implement proper port, readiness and liveness probes here.
           #DONE please provide a reasonable initialDelaySeconds here. You can try firstly remove it and see
@@ -58,4 +62,5 @@ spec:
           resources:
             #DONE define proper hardware resources here. Leverage resources definition
             # in Values.yaml
-            {{- toYaml .Values.resources.kitchenSvc | nindent 12 }}
+            {{- toYaml $.Values.resources.kitchenSvc | nindent 12 }}
+{{- end }} 

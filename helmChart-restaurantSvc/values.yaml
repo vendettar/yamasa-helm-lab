@@ -4,6 +4,21 @@
 
 replicaCount: 1
 
+# Kitchen Service 版本定义列表
+# Helm Chart 将为列表中的每一项创建一个独立的 Deployment
+kitchenServiceVersions:
+  - version: "v0"                  # 版本标识，将用作 version 标签的值
+    replicaCount: 1                # v0 版本的副本数
+    #deploymentNameSuffix: "-v0"   # 用于生成唯一的 Deployment 名称后缀 (例如 myrelease-kitchensvc-v0)
+    # imageTag: {{ .Values.image.kitchenSvc.tag }} # 使用顶层定义的 kitchenSvc tag 作为 v0 的默认值
+                                                 # 如果需要，可以在这里为 v0 指定不同的 tag
+    # resources: {}                              # 可选：如果 v0 需要特定资源配置，在这里覆盖顶层 kitchenSvc 资源
+  - version: "v1"
+    replicaCount: 1
+    # deploymentNameSuffix: "-v1"
+    # imageTag: "kitchen-service-new-tag"      # 可选：如果 v1 使用特定 tag
+    # resources: {}    
+
 #DONE implement docker repo and tags for the 2 services. In our lab, you need to put the 2 service
 #DONE images to the same repo, and distinguish them using tags.
 image:

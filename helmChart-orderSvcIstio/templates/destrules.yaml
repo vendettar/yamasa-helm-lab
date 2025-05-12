@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: {{ .Release.Name }}-destination-rule
+spec:
+  #DONE fill proper host here.
+  host: order-svc
+  trafficPolicy:
+    loadBalancer:
+      simple: RANDOM
+  subsets:
+    #DONE fill proper host subsets here. They should be grouped by deploy labels.
+    - name: v0
+      labels:
+        version: v0
+    - name: v1
+      labels:
+        version: v1

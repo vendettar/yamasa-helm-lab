@@ -1,43 +1,50 @@
+{{- /* Loop through each version defined in .Values.orderServiceVersions */}}
+{{- range .Values.orderServiceVersions }}
+--- 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-deploy
+  name: {{ $.Release.Name }}-deploy-{{ .version }}
   labels:
-    {{- include "ordersvc.labels" . | nindent 4 }}
+    {{- include "ordersvc.labels" $ | nindent 4 }}
+    version: {{ .version }}
+    helm-chart-deployment-version: {{ .version }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
+  {{- if not $.Values.autoscaling.enabled }}
+  replicas: {{ .replicaCount | default $.Values.replicaCount }} # .replicaCount 来自循环项, $.Values.replicaCount 来自顶层
   {{- end }}
   selector:
     matchLabels:
-      {{- include "ordersvc.selectorLabels" . | nindent 6 }}
+      {{- include "ordersvc.selectorLabels" $ | nindent 6 }}
+      version: {{ .version }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- with $.Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         #DONE define proper labels here, so that pod template could be bounded with service template.
-        {{- include "ordersvc.selectorLabels" . | nindent 8 }}
+        {{- include "ordersvc.selectorLabels" $ | nindent 8 }}
+        version: {{ .version }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "ordersvc.serviceAccountName" . }}
+      serviceAccountName: {{ include "ordersvc.serviceAccountName" $ }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml $.Values.podSecurityContext | nindent 8 }}
       containers:
         - name: ordersvcapp
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml $.Values.securityContext | nindent 12 }}
           # DONE use docker image repo and tag to concatenate correct image path here
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ $.Values.image.repository }}:{{ .imageTag | default $.Values.image.tag }}" # .imageTag 来自循环项
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
           #expose order svc port here
           ports:
-          - containerPort: {{ .Values.service.port }}
+          - containerPort: {{ $.Values.service.port }}
             name: http
           #DONE please choose a proper endpoint as application readiness and liveness probes.
           #DONE .e.g consider Spring Boot Actuator health endpoint
@@ -58,7 +65,7 @@ spec:
           resources:
           #DONE complete content here. You should carry cpu and memory resource definition block in Values.yaml
           # to this place. 'toYaml' is a handy template render function to render yaml block without content change.
-          {{- toYaml .Values.resources | nindent 12 }}
+          {{- toYaml $.Values.resources | nindent 12 }}
           env:
             - name: RESTAURANTSVC_HOST
               # DONE complete content here, to make order svc getting correct restaurant svc host and kitchen svc host here.
@@ -76,3 +83,4 @@ spec:
                   key: kitchensvc_name
             - name: KITCHENSVC_PORT
               value: "8764"
+{{- end }}

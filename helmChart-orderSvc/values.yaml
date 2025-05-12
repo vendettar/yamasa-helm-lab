@@ -4,6 +4,12 @@
 
 replicaCount: 1
 
+orderServiceVersions:
+  - version: "v0"
+    replicaCount: 1
+  - version: "v1"
+    replicaCount: 1
+
 image:
   repository: oonulven/nullius
   pullPolicy: IfNotPresent
@@ -49,11 +55,11 @@ resources:
 #DONE define proper hardware resource manifest here. Your implementation should contain
 #DONE 'requests' and 'limits' for both CPU and memory. Design them so that your app can run smoothly.
   requests:
-    cpu: "100m"
-    memory: "128Mi"
-  limits:
     cpu: "500m"
     memory: "512Mi"
+  limits:
+    cpu: "1"
+    memory: "1Gi"
 autoscaling:
   enabled: false
   minReplicas: 1
